@@ -1,0 +1,68 @@
+import tkinter as tk
+from tkinter import messagebox
+import pandas as pd
+import joblib
+import os
+
+# === Cargar el modelo entrenado ===
+modelo_path = r"C:\Users\anghe\Documents\Proyecto\modelo_10_atributos.pkl"
+modelo = joblib.load(modelo_path)
+
+# === Atributos usados en el modelo ===
+atributos = [
+    'SSLfinal_State', 'URL_of_Anchor', 'web_traffic',
+    'Links_in_tags', 'Prefix_Suffix', 'having_Sub_Domain',
+    'Google_Index', 'Request_URL', 'Page_Rank', 'Abnormal_URL'
+]
+
+# === Crear ventana principal ===
+ventana = tk.Tk()
+ventana.title("Sistema de Detección de Phishing")
+ventana.geometry("300x450")
+
+# === Variables para cada campo ===
+variables = {}
+for atributo in atributos:
+    variables[atributo] = tk.StringVar()
+
+# === Función para evaluar la URL ===
+def evaluar():
+    try:
+        # Recoger los valores de los campos
+        valores = []
+        for atributo in atributos:
+            entrada = variables[atributo].get().strip()
+            if entrada == "":
+                raise ValueError(f"El campo '{atributo}' está vacío.")
+            valor = int(entrada)
+            if valor not in [-1, 0, 1]:
+                raise ValueError(f"El campo '{atributo}' debe ser -1, 0 o 1.")
+            valores.append(valor)
+
+        # Crear DataFrame para la predicción
+        entrada_df = pd.DataFrame([valores], columns=atributos)
+
+        # Hacer predicción
+        resultado = modelo.predict(entrada_df)[0]
+
+        if resultado == -1:
+            mensaje = "⚠ Este sitio web es *phishing*."
+        else:
+            mensaje = "✔ Este sitio web es *legítimo*."
+
+        messagebox.showinfo("Resultado", mensaje)
+
+    except ValueError as e:
+        messagebox.showerror("Error", str(e))
+
+# === Crear campos en la ventana ===
+for i, atributo in enumerate(atributos):
+    tk.Label(ventana, text=atributo + ":").grid(row=i, column=0, padx=10, pady=5, sticky='w')
+    tk.Entry(ventana, textvariable=variables[atributo], width=15).grid(row=i, column=1)
+
+# === Botón para evaluar ===
+btn = tk.Button(ventana, text="Evaluar URL", command=evaluar, bg="blue", fg="white")
+btn.grid(row=len(atributos), columnspan=2, pady=20)
+
+# === Ejecutar ventana ===
+ventana.mainloop()
