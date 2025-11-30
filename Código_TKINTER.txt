@@ -5,7 +5,7 @@ import joblib
 import os
 
 # === Cargar el modelo entrenado ===
-modelo_path = r"C:\Users\anghe\Documents\Proyecto\modelo_10_atributos.pkl"
+modelo_path = r"C:\Users\Cruzado\Documents\Proyecto\modelo_10_atributos.pkl"
 modelo = joblib.load(modelo_path)
 
 # === Atributos usados en el modelo ===
@@ -65,4 +65,5 @@ btn = tk.Button(ventana, text="Evaluar URL", command=evaluar, bg="blue", fg="whi
 btn.grid(row=len(atributos), columnspan=2, pady=20)
 
 # === Ejecutar ventana ===
+
 ventana.mainloop()
